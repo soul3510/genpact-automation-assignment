@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Genpact.Automation.Tests", "Genpact.Automation.Tests\Genpact.Automation.Tests.csproj", "{00BB426D-3ABF-3311-1ED0-1CBB04FF11FF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{00BB426D-3ABF-3311-1ED0-1CBB04FF11FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00BB426D-3ABF-3311-1ED0-1CBB04FF11FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00BB426D-3ABF-3311-1ED0-1CBB04FF11FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00BB426D-3ABF-3311-1ED0-1CBB04FF11FF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CB3D7069-F0B7-4BDE-9F5E-39A86FB964BC}
+	EndGlobalSection
+EndGlobal
