@@ -9,6 +9,15 @@ on:
       - main
   workflow_dispatch:
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
 jobs:
   test:
     name: Run C# Playwright NUnit Tests
@@ -43,7 +52,6 @@ jobs:
           pwsh -ExecutionPolicy Bypass -File .\Genpact.Automation.Tests\bin\Debug\net8.0\playwright.ps1 install
 
       - name: Run tests
-        id: run_tests
         shell: pwsh
         run: |
           dotnet test `
@@ -56,18 +64,13 @@ jobs:
           "TEST_EXIT_CODE=$exitCode" | Out-File -FilePath $env:GITHUB_ENV -Append
           exit 0
 
-      - name: Show Allure result folders
-        if: always()
-        shell: pwsh
-        run: |
-          Get-ChildItem -Path . -Recurse -Directory -Filter allure-results | Select-Object FullName
-
       - name: Generate Allure HTML report
         if: always()
         shell: pwsh
         run: |
           Remove-Item -Recurse -Force .\allure-report -ErrorAction SilentlyContinue
           allure generate --output ".\allure-report"
+          New-Item -ItemType File -Path ".\allure-report\.nojekyll" -Force
 
       - name: Upload TRX test results
         if: always()
@@ -86,13 +89,19 @@ jobs:
             **/allure-results
           if-no-files-found: warn
 
-      - name: Upload Allure HTML report
+      - name: Upload Allure HTML report artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: allure-html-report
           path: allure-report
           if-no-files-found: warn
+
+      - name: Upload Allure report for GitHub Pages
+        if: always() && github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: allure-report
 
       - name: Fail workflow if tests failed
         if: always()
@@ -104,3 +113,18 @@ jobs:
           }
 
           exit [int]$env:TEST_EXIT_CODE
+
+  deploy-pages:
+    name: Deploy Allure Report to GitHub Pages
+    runs-on: ubuntu-latest
+    needs: test
+    if: always() && github.event_name != 'pull_request'
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy Allure report to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
