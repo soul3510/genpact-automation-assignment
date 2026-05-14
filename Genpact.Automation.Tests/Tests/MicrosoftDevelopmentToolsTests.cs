@@ -1,6 +1,9 @@
 using Genpact.Automation.Tests.Base;
 using Genpact.Automation.Tests.Pages;
 
+using Allure.NUnit;
+using Allure.NUnit.Attributes;
+
 namespace Genpact.Automation.Tests.Tests;
 
 
@@ -22,9 +25,12 @@ The test currently fails because the live Wikipedia page has two technology name
 **/
 
 [TestFixture]
+[AllureNUnit]
+[AllureFeature("Task 2 - Microsoft development tools links")]
 public class MicrosoftDevelopmentToolsTests : UiTestBase
 {
     [Test]
+    [AllureStory("Validate all technology names are text links")]
     public async Task MicrosoftDevelopmentTools_AllTechnologyNames_ShouldBeTextLinks()
     {
         var wikiPage = new PlaywrightWikiPage(Page);

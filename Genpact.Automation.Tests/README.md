@@ -104,7 +104,7 @@ Genpact.Automation.Tests/
 
 
 ##########################################################
-Task 3:  
+Task 3:  AppearanceColorTests.cs
 ##########################################################
 
 Requirement:
@@ -131,3 +131,14 @@ Genpact.Automation.Tests/
 ├── Services/
 ├── Tests/          -> Task 3: AppearanceColorTests.cs
 └── Utils/    
+
+
+##########################################################
+Allure Reports
+##########################################################
+
+Config file: 
+allureConfig.json
+
+Run Allure Report: 
+allure generate ".\Genpact.Automation.Tests\bin\Debug\net8.0\allure-results" --output ".\allure-report" --open

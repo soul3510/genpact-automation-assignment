@@ -1,12 +1,18 @@
 using Genpact.Automation.Tests.Base;
 using Genpact.Automation.Tests.Pages;
 
+using Allure.NUnit;
+using Allure.NUnit.Attributes;
+
 namespace Genpact.Automation.Tests.Tests;
 
 [TestFixture]
+[AllureNUnit]
+[AllureFeature("Task 3 - Appearance color")]
 public class AppearanceColorTests : UiTestBase
 {
     [Test]
+    [AllureStory("Change Color option to Dark and validate theme")]
     public async Task ColorBeta_WhenChangedToDark_ShouldApplyDarkTheme()
     {
 

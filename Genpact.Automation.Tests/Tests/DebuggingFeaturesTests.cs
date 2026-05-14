@@ -3,12 +3,19 @@ using Genpact.Automation.Tests.Pages;
 using Genpact.Automation.Tests.Services;
 using Genpact.Automation.Tests.Utils;
 
+using Allure.NUnit;
+using Allure.NUnit.Attributes;
+
 namespace Genpact.Automation.Tests.Tests;
 
+
 [TestFixture]
+[AllureNUnit]
+[AllureFeature("Task 1 - Debugging features comparison")]
 public class DebuggingFeaturesTests : UiTestBase
 {
     [Test]
+    [AllureStory("Compare UI and API unique word counts")]
     public async Task DebuggingFeatures_UiAndApiUniqueWordCounts_ShouldBeEqual()
     {
         var wikiPage = new PlaywrightWikiPage(Page);

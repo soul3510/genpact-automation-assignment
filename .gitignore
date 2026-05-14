@@ -427,3 +427,18 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+
+
+# Build artifacts
+bin/
+obj/
+
+# Allure
+allure-results/
+allure-report/
+**/allure-results/
+**/allure-report/
+
+# Playwright traces
+trace-*.zip

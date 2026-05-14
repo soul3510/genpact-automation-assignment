@@ -21,7 +21,7 @@ ProjectAssetsFile=<PATH>obj/project.assets.json
 RootNamespace=Genpact.Automation.Tests
 RunAnalyzers=
 RunAnalyzersDuringLiveAnalysis=
-SolutionPath=*Undefined*
+SolutionPath=<PATH>../genpact-automation-assignment.sln
 TargetFrameworkIdentifier=.NETCoreApp
 TargetPath=<PATH>bin/Debug/net8.0/Genpact.Automation.Tests.dll
 TargetRefPath=<PATH>obj/Debug/net8.0/ref/Genpact.Automation.Tests.dll
@@ -236,6 +236,9 @@ Utils/TextNormalizer.cs
  System.Xml.XPath.XDocument.dll
  WindowsBase.dll
 <NUGET>/
+ allure.net.commons/2.15.0/lib/netstandard2.0/Allure.Net.Commons.dll
+ allure.nunit/2.15.0/lib/netstandard2.0/Allure.NUnit.dll
+ aspectinjector/2.8.1/lib/netstandard2.0/AspectInjector.Broker.dll
  microsoft.bcl.asyncinterfaces/6.0.0/lib/netstandard2.1/Microsoft.Bcl.AsyncInterfaces.dll
  microsoft.codecoverage/17.8.0/lib/netcoreapp3.1/Microsoft.VisualStudio.CodeCoverage.Shim.dll
  microsoft.playwright.nunit/1.59.0/lib/netcoreapp3.1/Microsoft.Playwright.NUnit.dll
@@ -250,7 +253,8 @@ Utils/TextNormalizer.cs
   Microsoft.VisualStudio.TestPlatform.Common.dll
   Microsoft.VisualStudio.TestPlatform.ObjectModel.dll
   testhost.dll
- newtonsoft.json/13.0.1/lib/netstandard2.0/Newtonsoft.Json.dll
+ mimetypesmap/1.0.9/lib/netstandard2.0/MimeTypesMap.dll
+ newtonsoft.json/13.0.4/lib/net6.0/Newtonsoft.Json.dll
  nuget.frameworks/6.5.0/lib/netstandard2.0/NuGet.Frameworks.dll
  nunit/3.14.0/lib/netstandard2.0/nunit.framework.dll
 
@@ -265,6 +269,11 @@ Utils/TextNormalizer.cs
 <DOTNET>/sdk/10.0.300/Sdks/Microsoft.NET.Sdk/analyzers/
  Microsoft.CodeAnalysis.CSharp.NetAnalyzers.dll
  Microsoft.CodeAnalysis.NetAnalyzers.dll
+<NUGET>/aspectinjector/2.8.1/analyzers/dotnet/cs/
+ AspectInjector.Analyzer.dll
+ AspectInjector.Broker.dll
+ AspectInjector.Rules.dll
+ FluentIL.Common.dll
 <NUGET>/nunit.analyzers/3.9.0/analyzers/dotnet/cs/nunit.analyzers.dll
 
 [analyzerConfigFiles]
