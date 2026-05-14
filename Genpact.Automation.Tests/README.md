@@ -1,7 +1,7 @@
 # genpact-automation-assignment
 C# Playwright automation assignment for UI and API validation on Wikipedia
 
-
+Please Note: 
 Although my main recent automation work has been in Java, TypeScript and Playwright, I implemented this assignment in C# as requested, focusing on clean architecture, maintainability, and reliable UI/API validation.
 
 ##########################################################
@@ -31,7 +31,7 @@ Genpact.Automation.Tests/
 ├── Pages/          - POM - Page Object Model
 ├── Services/
 ├── Tests/          
-└── Utils/           
+└── Utils/          
 
 
 ##########################################################
@@ -47,7 +47,7 @@ Requirement:
 • Assert that both counts are equal
 
 Explanation:
-I created a C# NUnit Playwright project with a clean structure.
+There are 2 phases to the test: FE + BE.
 The UI part uses a Page Object to open the Playwright Wikipedia page and extract only the Debugging features section.
 The API part uses the MediaWiki Parse API. Instead of hardcoding the section index, I first retrieve the page sections, find the matching section by title or anchor, and then request that section’s HTML.
 Since UI and API return slightly different formatting, I normalize both texts before comparison.
@@ -134,7 +134,7 @@ Genpact.Automation.Tests/
 
 
 ##########################################################
-Allure Reports
+Bonus: Allure Reports
 ##########################################################
 
 Config file: 
