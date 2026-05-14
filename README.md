@@ -194,6 +194,42 @@ Run Allure Report:
 
 ##########################################################
 
-Github Actions
+Github Actions - Run the tests from GitHub
 ------------
+
 ##########################################################
+
+This repository includes a GitHub Actions workflow that runs the automation tests directly from GitHub.
+
+The workflow is triggered automatically on:
+
+- Push to `main`
+- Pull request to `main`
+- Manual execution using `workflow_dispatch`
+
+To run the tests manually:
+
+1. Open the GitHub Actions page:
+   - https://github.com/soul3510/genpact-automation-assignment/actions
+
+2. Select the workflow:
+   - `.NET Playwright Tests`
+
+3. Click:
+   - `Run workflow`
+
+4. Select the `main` branch.
+
+5. Click:
+   - `Run workflow`
+
+
+   ### GitHub Actions status
+
+The GitHub Actions workflow is configured to fail when one or more tests fail.
+
+Task 2 is a strict validation. If the live Wikipedia page contains technology names under "Microsoft development tools" that are not text links, the test fails and reports the exact non-linked names.
+
+Therefore, a failed workflow can still indicate that the automation framework executed correctly and detected a valid issue in the page content.
+
+The Allure HTML report and test results are uploaded as workflow artifacts even when the test run fails.
