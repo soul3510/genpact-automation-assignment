@@ -190,3 +190,10 @@ Config file:
 Run Allure Report: 
 
  - allure generate ".\Genpact.Automation.Tests\bin\Debug\net8.0\allure-results" --output ".\allure-report" --open
+
+
+##########################################################
+
+Github Actions
+------------
+##########################################################

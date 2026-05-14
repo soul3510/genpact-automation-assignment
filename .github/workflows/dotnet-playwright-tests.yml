@@ -1,0 +1,106 @@
+name: .NET Playwright Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Run C# Playwright NUnit Tests
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Setup Node.js for Allure CLI
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+
+      - name: Install Allure CLI
+        run: npm install -g allure
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build project
+        run: dotnet build --configuration Debug --no-restore
+
+      - name: Install Playwright browsers
+        shell: pwsh
+        run: |
+          pwsh -ExecutionPolicy Bypass -File .\Genpact.Automation.Tests\bin\Debug\net8.0\playwright.ps1 install
+
+      - name: Run tests
+        id: run_tests
+        shell: pwsh
+        run: |
+          dotnet test `
+            --configuration Debug `
+            --no-build `
+            --logger "trx;LogFileName=test-results.trx" `
+            --results-directory ".\TestResults"
+
+          $exitCode = $LASTEXITCODE
+          "TEST_EXIT_CODE=$exitCode" | Out-File -FilePath $env:GITHUB_ENV -Append
+          exit 0
+
+      - name: Show Allure result folders
+        if: always()
+        shell: pwsh
+        run: |
+          Get-ChildItem -Path . -Recurse -Directory -Filter allure-results | Select-Object FullName
+
+      - name: Generate Allure HTML report
+        if: always()
+        shell: pwsh
+        run: |
+          Remove-Item -Recurse -Force .\allure-report -ErrorAction SilentlyContinue
+          allure generate --output ".\allure-report"
+
+      - name: Upload TRX test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trx-test-results
+          path: TestResults
+          if-no-files-found: warn
+
+      - name: Upload Allure results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results
+          path: |
+            **/allure-results
+          if-no-files-found: warn
+
+      - name: Upload Allure HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-html-report
+          path: allure-report
+          if-no-files-found: warn
+
+      - name: Fail workflow if tests failed
+        if: always()
+        shell: pwsh
+        run: |
+          if (-not $env:TEST_EXIT_CODE) {
+            Write-Error "TEST_EXIT_CODE was not set."
+            exit 1
+          }
+
+          exit [int]$env:TEST_EXIT_CODE
