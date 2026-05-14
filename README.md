@@ -187,7 +187,7 @@ Config file:
 
 - allureConfig.json
 
-Run Allure Report: 
+Run Allure Report from terminal: 
 
  - allure generate ".\Genpact.Automation.Tests\bin\Debug\net8.0\allure-results" --output ".\allure-report" --open
 
@@ -233,3 +233,5 @@ Task 2 is a strict validation. If the live Wikipedia page contains technology na
 Therefore, a failed workflow can still indicate that the automation framework executed correctly and detected a valid issue in the page content.
 
 The Allure HTML report and test results are uploaded as workflow artifacts even when the test run fails.
+
+Link to generated Allure Report in gitHub: https://soul3510.github.io/genpact-automation-assignment/
