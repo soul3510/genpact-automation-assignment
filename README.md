@@ -35,9 +35,10 @@ Genpact.Automation.Tests/
 
 
 ##########################################################
-Task 1:  
+Task 1: DebuggingFeaturesTests.cs
 ##########################################################
 
+Scenario:
 • Extract the “Debugging features” section:
     o via UI (POM approach)
     o via API (MediaWiki Parse API)
@@ -45,6 +46,7 @@ Task 1:
 • Count unique words
 • Assert that both counts are equal
 
+Explanation:
 I created a C# NUnit Playwright project with a clean structure.
 The UI part uses a Page Object to open the Playwright Wikipedia page and extract only the Debugging features section.
 The API part uses the MediaWiki Parse API. Instead of hardcoding the section index, I first retrieve the page sections, find the matching section by title or anchor, and then request that section’s HTML.
@@ -53,7 +55,24 @@ Finally, the test counts unique words from both sources and asserts equality.
 
 Genpact.Automation.Tests/
 ├── Base/
-├── Pages/
+├── Pages/              -> Task 1: PlaywrightWikiPage.cs (POM - Page Object Model)
 ├── Services/           -> Task 1: MediaWikiApiClient.cs
 ├── Tests/              -> Task 1: DebuggingFeaturesTests.cs
 └── Utils/              -> Task 1: text normalization
+
+##########################################################
+Task 2:  MicrosoftDevelopmentToolsTests.cs
+##########################################################
+
+Scenario:
+Via UI: go to Microsoft development tools section and validate that all the technology names under this section are text links. If one is not a link, the test should fail.
+
+Explanation:
+I implemented Task 2 as a strict validation. I navigate to the page, locate the Microsoft development tools navbox, inspect each technology list item, and verify that the visible technology name is represented by a direct text link. If any technology name is plain text instead of an anchor with href, the test fails and prints the exact names.
+
+Genpact.Automation.Tests/
+├── Base/
+├── Pages/              -> Task 2: PlaywrightWikiPage.cs (POM - Page Object Model)
+├── Services/           -> Task 2: 
+├── Tests/              -> Task 2: MicrosoftDevelopmentToolsTests.cs
+└── Utils/              -> Task 2: 

@@ -79,4 +79,79 @@ public class PlaywrightWikiPage
             }"
         );
     }
+
+
+   public async Task<IReadOnlyList<string>> GetNonLinkedTechnologyNamesInMicrosoftDevelopmentToolsAsync()
+{
+    await _page.WaitForLoadStateAsync(LoadState.DOMContentLoaded);
+
+    await _page.WaitForFunctionAsync(
+        @"() => document.body && document.body.textContent.includes('Microsoft development tools')",
+        null,
+        new PageWaitForFunctionOptions
+        {
+            Timeout = 60000
+        }
+    );
+
+    var nonLinkedTechnologyNames = await _page.EvaluateAsync<string[]>(
+        @"() => {
+            const normalize = text => (text || '')
+                .replace(/\s+/g, ' ')
+                .trim();
+
+            const candidates = Array.from(
+                document.querySelectorAll('table, div, nav')
+            )
+            .filter(element => {
+                const text = normalize(element.textContent);
+                return text.includes('Microsoft development tools');
+            })
+            .sort((a, b) =>
+                normalize(a.textContent).length - normalize(b.textContent).length
+            );
+
+            const container = candidates[0];
+
+            if (!container) {
+                throw new Error('Could not find Microsoft development tools container.');
+            }
+
+            const showToggle = Array.from(container.querySelectorAll('button, a, span'))
+                .find(element => /^show$/i.test(normalize(element.textContent)));
+
+            if (showToggle) {
+                showToggle.click();
+            }
+
+            const listItems = Array.from(container.querySelectorAll('li'));
+            const nonLinkedItems = [];
+
+            for (const item of listItems) {
+                const itemClone = item.cloneNode(true);
+
+                itemClone
+                    .querySelectorAll('ul, ol, style, script')
+                    .forEach(element => element.remove());
+
+                const technologyName = normalize(itemClone.textContent);
+
+                if (!technologyName) {
+                    continue;
+                }
+
+                const hasMatchingTextLink = Array.from(item.querySelectorAll('a[href]'))
+                    .some(link => normalize(link.textContent) === technologyName);
+
+                if (!hasMatchingTextLink) {
+                    nonLinkedItems.push(technologyName);
+                }
+            }
+
+            return [...new Set(nonLinkedItems)];
+        }"
+    );
+
+    return nonLinkedTechnologyNames;
+}
 }
