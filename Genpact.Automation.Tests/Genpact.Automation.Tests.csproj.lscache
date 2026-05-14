@@ -59,7 +59,9 @@ obj/Debug/net8.0/
  .NETCoreApp,Version=v8.0.AssemblyAttributes.cs
  Genpact.Automation.Tests.AssemblyInfo.cs
  Genpact.Automation.Tests.GlobalUsings.g.cs
-Pages/PlaywrightWikiPage.cs
+Pages/
+ MicrosoftDevelopmentToolsLinkValidationResult.cs
+ PlaywrightWikiPage.cs
 Services/MediaWikiApiClient.cs
 Tests/
  DebuggingFeaturesTests.cs

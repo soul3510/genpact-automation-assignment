@@ -80,13 +80,15 @@ public class PlaywrightWikiPage
         );
     }
 
-
-   public async Task<IReadOnlyList<string>> GetNonLinkedTechnologyNamesInMicrosoftDevelopmentToolsAsync()
+public async Task<MicrosoftDevelopmentToolsLinkValidationResult> GetMicrosoftDevelopmentToolsLinkValidationResultAsync()
 {
     await _page.WaitForLoadStateAsync(LoadState.DOMContentLoaded);
 
     await _page.WaitForFunctionAsync(
-        @"() => document.body && document.body.textContent.includes('Microsoft development tools')",
+        @"() => {
+            const text = document.body?.textContent || '';
+            return text.includes('Microsoft development tools');
+        }",
         null,
         new PageWaitForFunctionOptions
         {
@@ -94,27 +96,47 @@ public class PlaywrightWikiPage
         }
     );
 
-    var nonLinkedTechnologyNames = await _page.EvaluateAsync<string[]>(
+    var result = await _page.EvaluateAsync<string[][]>(
         @"() => {
             const normalize = text => (text || '')
                 .replace(/\s+/g, ' ')
                 .trim();
 
+            const getDirectTechnologyName = item => {
+                const clone = item.cloneNode(true);
+
+                clone
+    .querySelectorAll('ul, ol, style, script, .navbar, .navbar-mini, .plainlinks')
+    .forEach(element => element.remove());
+
+                return normalize(clone.textContent);
+            };
+
             const candidates = Array.from(
                 document.querySelectorAll('table, div, nav')
             )
-            .filter(element => {
+            .map(element => {
                 const text = normalize(element.textContent);
-                return text.includes('Microsoft development tools');
-            })
-            .sort((a, b) =>
-                normalize(a.textContent).length - normalize(b.textContent).length
-            );
+                const listItemsCount = element.querySelectorAll('li').length;
 
-            const container = candidates[0];
+                return {
+                    element,
+                    text,
+                    listItemsCount
+                };
+            })
+            .filter(candidate =>
+                candidate.text.includes('Microsoft development tools') &&
+                candidate.text.includes('WinDbg') &&
+                candidate.text.includes('Visual Studio') &&
+                candidate.listItemsCount > 5
+            )
+            .sort((a, b) => a.text.length - b.text.length);
+
+            const container = candidates[0]?.element;
 
             if (!container) {
-                throw new Error('Could not find Microsoft development tools container.');
+                throw new Error('Could not find Microsoft development tools container with technology items.');
             }
 
             const showToggle = Array.from(container.querySelectorAll('button, a, span'))
@@ -124,34 +146,53 @@ public class PlaywrightWikiPage
                 showToggle.click();
             }
 
-            const listItems = Array.from(container.querySelectorAll('li'));
-            const nonLinkedItems = [];
+const listItems = Array.from(container.querySelectorAll('li'))
+    .filter(item =>
+        !item.closest('.navbar') &&
+        !item.closest('.navbar-mini') &&
+        !item.closest('.plainlinks')
+    );
+
+            const technologyNames = [];
+            const nonLinkedTechnologyNames = [];
 
             for (const item of listItems) {
-                const itemClone = item.cloneNode(true);
-
-                itemClone
-                    .querySelectorAll('ul, ol, style, script')
-                    .forEach(element => element.remove());
-
-                const technologyName = normalize(itemClone.textContent);
+                const technologyName = getDirectTechnologyName(item);
 
                 if (!technologyName) {
                     continue;
                 }
 
-                const hasMatchingTextLink = Array.from(item.querySelectorAll('a[href]'))
-                    .some(link => normalize(link.textContent) === technologyName);
+                const isUiControl =
+                    /^show$/i.test(technologyName) ||
+                    /^hide$/i.test(technologyName);
 
-                if (!hasMatchingTextLink) {
-                    nonLinkedItems.push(technologyName);
+                if (isUiControl) {
+                    continue;
+                }
+
+                technologyNames.push(technologyName);
+
+                const matchingLinks = Array.from(item.querySelectorAll('a[href]'))
+                    .filter(link => normalize(link.textContent) === technologyName);
+
+                const isTextLink = matchingLinks.length > 0;
+
+                if (!isTextLink) {
+                    nonLinkedTechnologyNames.push(technologyName);
                 }
             }
 
-            return [...new Set(nonLinkedItems)];
+            return [
+                [...new Set(technologyNames)],
+                [...new Set(nonLinkedTechnologyNames)]
+            ];
         }"
     );
 
-    return nonLinkedTechnologyNames;
-}
+    return new MicrosoftDevelopmentToolsLinkValidationResult(
+        result[0],
+        result[1]
+    );
+} 
 }

@@ -28,7 +28,7 @@ The test itself stays readable and focuses on the business validation, while UI 
 
 Genpact.Automation.Tests/
 ├── Base/
-├── Pages/          - Page Object
+├── Pages/          - POM - Page Object Model
 ├── Services/
 ├── Tests/          
 └── Utils/           
@@ -55,7 +55,7 @@ Finally, the test counts unique words from both sources and asserts equality.
 
 Genpact.Automation.Tests/
 ├── Base/
-├── Pages/              -> Task 1: PlaywrightWikiPage.cs (POM - Page Object Model)
+├── Pages/              -> Task 1: PlaywrightWikiPage.cs
 ├── Services/           -> Task 1: MediaWikiApiClient.cs
 ├── Tests/              -> Task 1: DebuggingFeaturesTests.cs
 └── Utils/              -> Task 1: text normalization
@@ -68,11 +68,30 @@ Scenario:
 Via UI: go to Microsoft development tools section and validate that all the technology names under this section are text links. If one is not a link, the test should fail.
 
 Explanation:
-I implemented Task 2 as a strict validation. I navigate to the page, locate the Microsoft development tools navbox, inspect each technology list item, and verify that the visible technology name is represented by a direct text link. If any technology name is plain text instead of an anchor with href, the test fails and prints the exact names.
+
+Task 2 is implemented as a strict validation.
+At the time of execution, the test finds 124 technology names under the "Microsoft development tools" section.
+The test fails because the following technology names are rendered as plain text instead of links:
+
+- Visual Basic
+- Playwright
+
+This is the expected behavior according to the assignment requirement: if a technology name is not a text link, the test should fail.
+
+Test Scenrio Logic:
+
+1. Navigate to the Playwright Wikipedia page.
+2. Scroll/find the Microsoft development tools box.
+3. Click Show if the box is collapsed.
+4. Collect all actual technology-name list items inside the box.
+5. Ignore group headers and UI controls.
+6. Assert at least one technology was found.
+7. Validate each technology name has a matching <a href>.
+8. Fail with a clear list of non-linked names.
 
 Genpact.Automation.Tests/
 ├── Base/
-├── Pages/              -> Task 2: PlaywrightWikiPage.cs (POM - Page Object Model)
+├── Pages/              -> Task 2: PlaywrightWikiPage.cs, MicrosoftDevelopmentToolsLinkValidationResult.cs
 ├── Services/           -> Task 2: 
 ├── Tests/              -> Task 2: MicrosoftDevelopmentToolsTests.cs
 └── Utils/              -> Task 2: 
