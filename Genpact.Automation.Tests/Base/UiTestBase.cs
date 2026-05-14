@@ -7,10 +7,26 @@ public class UiTestBase : PageTest
 {
     protected const string WikipediaPlaywrightUrl = "https://en.wikipedia.org/wiki/Playwright_(software)";
 
+    public override BrowserNewContextOptions ContextOptions()
+    {
+        return new BrowserNewContextOptions
+        {
+
+            /**
+            I set a desktop viewport because the Color beta control is part of Wikipedia’s right-side appearance panel. 
+            On smaller screens the layout can change or collapse, so setting a predictable viewport makes the UI test more stable and deterministic.
+            **/
+            ViewportSize = new ViewportSize
+            {
+                Width = 1600,
+                Height = 1000
+            }
+        };
+    }
+
     [SetUp]
     public async Task BaseSetUp()
     {
-
         /**
         I added tracing to make failures easier to investigate.
         Playwright trace files can show screenshots, DOM snapshots, actions, timing, and source information, so instead of guessing why a UI test failed, I can open the trace and debug the exact browser state.
@@ -28,15 +44,16 @@ public class UiTestBase : PageTest
     [TearDown]
     public async Task BaseTearDown()
     {
-        /**
-        Stopped tracing and saved the trace file with a name that includes the test name. This way, if a test fails, I can easily find the corresponding trace file in the test output directory and open it with Playwright's Trace Viewer for debugging.
-        **/
+    
         var testName = TestContext.CurrentContext.Test.Name.Replace(" ", "_");
         var tracePath = Path.Combine(
             TestContext.CurrentContext.WorkDirectory,
             $"trace-{testName}.zip"
         );
 
+       /**
+        Stopped tracing and saved the trace file with a name that includes the test name. This way, if a test fails, I can easily find the corresponding trace file in the test output directory and open it with Playwright's Trace Viewer for debugging.
+        **/
         await Context.Tracing.StopAsync(new()
         {
             Path = tracePath

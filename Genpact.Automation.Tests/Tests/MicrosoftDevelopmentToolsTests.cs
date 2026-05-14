@@ -46,6 +46,11 @@ public class MicrosoftDevelopmentToolsTests : UiTestBase
             $"Non-linked technology names: {string.Join(", ", validationResult.NonLinkedTechnologyNames)}"
         );
 
+/**
+Prevent a false positive: by asserting that at least one technology name was found, we ensure that the test is actually validating the correct section of the page.
+If the locator is wrong and finds zero technology names, the list of non-linked items would also be empty, and the test would pass without validating anything.
+So I assert that technology names were actually found before checking if non-linked names are empty.
+**/
         Assert.That(
             validationResult.TechnologyNames,
             Is.Not.Empty,
@@ -53,6 +58,10 @@ public class MicrosoftDevelopmentToolsTests : UiTestBase
             "This prevents a false positive where the test passes without validating anything."
         );
 
+/**
+Playwright is a known item inside the Microsoft development tools box.
+I used it as a sanity check to prove the test reached the correct section and did not validate some unrelated part of the page.
+**/
         Assert.That(
             validationResult.TechnologyNames,
             Has.Some.EqualTo("Playwright"),

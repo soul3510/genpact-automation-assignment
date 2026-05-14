@@ -195,4 +195,224 @@ const listItems = Array.from(container.querySelectorAll('li'))
         result[1]
     );
 } 
+
+
+public async Task SetColorBetaToLightAsync()
+{
+    await SelectColorBetaOptionAsync("Light");
+}
+
+public async Task SetColorBetaToDarkAsync()
+{
+    await SelectColorBetaOptionAsync("Dark");
+}
+
+public async Task<AppearanceColorState> GetAppearanceColorStateAsync()
+{
+    var result = await _page.EvaluateAsync<string[]>(
+        @"() => {
+            const normalize = text => (text || '')
+                .replace(/\s+/g, ' ')
+                .trim();
+
+            const getLabelText = input => {
+                if (input.labels && input.labels.length > 0) {
+                    return normalize(Array.from(input.labels)
+                        .map(label => label.textContent)
+                        .join(' '));
+                }
+
+                const id = input.getAttribute('id');
+
+                if (id) {
+                    const label = document.querySelector(`label[for='${CSS.escape(id)}']`);
+                    if (label) {
+                        return normalize(label.textContent);
+                    }
+                }
+
+                return normalize(input.getAttribute('aria-label') || '');
+            };
+
+            const colorInputs = Array.from(document.querySelectorAll('input[type=""radio""]'))
+                .filter(input => ['Automatic', 'Light', 'Dark'].includes(getLabelText(input)));
+
+            const checkedInput = colorInputs.find(input => input.checked);
+            const selectedColor = checkedInput ? getLabelText(checkedInput) : '';
+
+            const parseRgb = color => {
+                const match = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
+
+                if (!match) {
+                    return null;
+                }
+
+                return {
+                    r: Number(match[1]),
+                    g: Number(match[2]),
+                    b: Number(match[3])
+                };
+            };
+
+            const getUsableBackgroundColor = () => {
+                const candidates = [
+                    document.documentElement,
+                    document.body,
+                    document.querySelector('.mw-page-container'),
+                    document.querySelector('#content'),
+                    document.querySelector('main')
+                ].filter(Boolean);
+
+                for (const element of candidates) {
+                    const color = getComputedStyle(element).backgroundColor;
+
+                    if (color && color !== 'transparent' && !color.endsWith(', 0)')) {
+                        return color;
+                    }
+                }
+
+                return getComputedStyle(document.body).backgroundColor;
+            };
+
+            const backgroundColor = getUsableBackgroundColor();
+            const rgb = parseRgb(backgroundColor);
+
+            const luminance = rgb
+                ? ((0.2126 * rgb.r) + (0.7152 * rgb.g) + (0.0722 * rgb.b))
+                : 255;
+
+            const isDarkModeApplied =
+                selectedColor === 'Dark' &&
+                luminance < 128;
+
+            return [
+                selectedColor,
+                backgroundColor,
+                String(isDarkModeApplied)
+            ];
+        }"
+    );
+
+    return new AppearanceColorState(
+        result[0],
+        result[1],
+        bool.Parse(result[2])
+    );
+}
+
+private async Task SelectColorBetaOptionAsync(string optionName)
+{
+    await _page.WaitForLoadStateAsync(LoadState.DOMContentLoaded);
+
+    await _page.WaitForFunctionAsync(
+        @"() => {
+            const text = document.body?.textContent || '';
+            return text.includes('Color') &&
+                   text.includes('Light') &&
+                   text.includes('Dark');
+        }",
+        null,
+        new PageWaitForFunctionOptions
+        {
+            Timeout = 60000
+        }
+    );
+
+    var radioOption = _page.GetByRole(
+        AriaRole.Radio,
+        new PageGetByRoleOptions
+        {
+            Name = optionName,
+            Exact = true
+        }
+    );
+
+    if (await radioOption.CountAsync() > 0)
+    {
+        await radioOption.First.CheckAsync(new LocatorCheckOptions
+        {
+            Force = true
+        });
+    }
+    else
+    {
+        var clicked = await _page.EvaluateAsync<bool>(
+            @"optionName => {
+                const normalize = text => (text || '')
+                    .replace(/\s+/g, ' ')
+                    .trim();
+
+                const labels = Array.from(document.querySelectorAll('label'))
+                    .filter(label => normalize(label.textContent) === optionName);
+
+                for (const label of labels) {
+                    const forAttribute = label.getAttribute('for');
+
+                    if (forAttribute) {
+                        const input = document.getElementById(forAttribute);
+
+                        if (input && input.type === 'radio') {
+                            input.click();
+                            return true;
+                        }
+                    }
+
+                    const nestedInput = label.querySelector('input[type=""radio""]');
+
+                    if (nestedInput) {
+                        nestedInput.click();
+                        return true;
+                    }
+                }
+
+                return false;
+            }",
+            optionName
+        );
+
+        if (!clicked)
+        {
+            throw new InvalidOperationException($"Could not find Color (beta) option: {optionName}");
+        }
+    }
+
+    await _page.WaitForFunctionAsync(
+        @"optionName => {
+            const normalize = text => (text || '')
+                .replace(/\s+/g, ' ')
+                .trim();
+
+            const getLabelText = input => {
+                if (input.labels && input.labels.length > 0) {
+                    return normalize(Array.from(input.labels)
+                        .map(label => label.textContent)
+                        .join(' '));
+                }
+
+                const id = input.getAttribute('id');
+
+                if (id) {
+                    const label = document.querySelector(`label[for='${CSS.escape(id)}']`);
+
+                    if (label) {
+                        return normalize(label.textContent);
+                    }
+                }
+
+                return normalize(input.getAttribute('aria-label') || '');
+            };
+
+            return Array.from(document.querySelectorAll('input[type=""radio""]'))
+                .some(input =>
+                    input.checked &&
+                    getLabelText(input) === optionName
+                );
+        }",
+        optionName,
+        new PageWaitForFunctionOptions
+        {
+            Timeout = 10000
+        }
+    );
+}
 }

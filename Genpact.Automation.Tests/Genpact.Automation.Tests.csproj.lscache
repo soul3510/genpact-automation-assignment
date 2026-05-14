@@ -60,10 +60,12 @@ obj/Debug/net8.0/
  Genpact.Automation.Tests.AssemblyInfo.cs
  Genpact.Automation.Tests.GlobalUsings.g.cs
 Pages/
+ AppearanceColorState.cs
  MicrosoftDevelopmentToolsLinkValidationResult.cs
  PlaywrightWikiPage.cs
 Services/MediaWikiApiClient.cs
 Tests/
+ AppearanceColorTests.cs
  DebuggingFeaturesTests.cs
  MicrosoftDevelopmentToolsTests.cs
 Utils/TextNormalizer.cs
